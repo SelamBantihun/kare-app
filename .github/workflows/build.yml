@@ -21,77 +21,47 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Generate App & Inject Kare Website
+      - name: Generate App and Build APK
         run: |
           flutter create --org com.kareinvestment --project-name kare_app app_build
           cd app_build
           flutter pub add webview_flutter
           sed -i 's/android:label="kare_app"/android:label="Kare Investment Group"/g' android/app/src/main/AndroidManifest.xml
           sed -i 's/<application/<uses-permission android:name="android.permission.INTERNET"\/>\n    <application android:usesCleartextTraffic="true"/g' android/app/src/main/AndroidManifest.xml
-          
-          cat << 'EOF' > lib/main.dart
-          import 'package:flutter/material.dart';
-          import 'package:webview_flutter/webview_flutter.dart';
-
-          void main() {
-            runApp(const MaterialApp(
-              title: 'Kare Investment Group',
-              debugShowCheckedModeBanner: false,
-              home: WebViewApp(),
-            ));
-          }
-
-          class WebViewApp extends StatefulWidget {
-            const WebViewApp({super.key});
-            @override
-            State<WebViewApp> createState() => _WebViewAppState();
-          }
-
-          class _WebViewAppState extends State<WebViewApp> {
-            late final WebViewController _controller;
-            bool _isLoading = true;
-
-            @override
-            void initState() {
-              super.initState();
-              _controller = WebViewController()
-                ..setJavaScriptMode(JavaScriptMode.unrestricted)
-                ..setNavigationDelegate(
-                  NavigationDelegate(
-                    onPageStarted: (_) => setState(() => _isLoading = true),
-                    onPageFinished: (_) => setState(() => _isLoading = false),
-                  ),
-                )
-                ..loadRequest(Uri.parse('https://kareinvestmentgroup.com/'));
-            }
-
-            @override
-            Widget build(BuildContext context) {
-              return PopScope(
-                canPop: false,
-                onPopInvokedWithResult: (didPop, result) async {
-                  if (didPop) return;
-                  if (await _controller.canGoBack()) {
-                    await _controller.goBack();
-                  }
-                },
-                child: Scaffold(
-                  backgroundColor: Colors.white,
-                  body: SafeArea(
-                    child: Stack(
-                      children: [
-                        WebViewWidget(controller: _controller),
-                        if (_isLoading)
-                          const Center(child: CircularProgressIndicator()),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-          }
-          EOF
-          
+          echo "aW1wb3J0ICdwYWNrYWdlOmZsdXR0ZXIvbWF0ZXJpYWwuZGFydCc7CmltcG9ydCAn" > main.b64
+          echo "cGFja2FnZTp3ZWJ2aWV3X2ZsdXR0ZXIvd2Vidmlld19mbHV0dGVyLmRhcnQnOwoK" >> main.b64
+          echo "dm9pZCBtYWluKCkgewogIHJ1bkFwcChjb25zdCBNYXRlcmlhbEFwcCgKICAgIHRp" >> main.b64
+          echo "dGxlOiAnS2FyZSBJbnZlc3RtZW50IEdyb3VwJywKICAgIGRlYnVnU2hvd0NoZWNr" >> main.b64
+          echo "ZWRNb2RlQmFubmVyOiBmYWxzZSwKICAgIGhvbWU6IFdlYlZpZXdBcHAoKSwKICAp" >> main.b64
+          echo "KTsKfQoKY2xhc3MgV2ViVmlld0FwcCBleHRlbmRzIFN0YXRlZnVsV2lkZ2V0IHsK" >> main.b64
+          echo "ICBjb25zdCBXZWIWaWV3QXBwKHtzdXBlci5rZXl9KTsKICBAb3ZlcnJpZGUKICBT" >> main.b64
+          echo "dGF0ZTxXZWIWaWV3QXBwPiBjcmVhdGVTdGF0ZSgpID0+IF9XZWIWaWV3QXBwU3Rh" >> main.b64
+          echo "dGUoKTsKfQoKY2xhc3MgX1dlYlZpZXdBcHBTdGF0ZSBleHRlbmRzIFN0YXRlPFdl" >> main.b64
+          echo "YlZpZXdBcHA+IHsKICBsYXRlIGZpbmFsIFdlYlZpZXdDb250cm9sbGVyIF9jb250" >> main.b64
+          echo "cm9sbGVyOwogIGJvb2wgX2lzTG9hZGluZyA9IHRydWU7CgogIEBvdmVycmlkZQog" >> main.b64
+          echo "IHZvaWQgaW5pdFN0YXRlKCkgewogICAgc3VwZXIuaW5pdFN0YXRlKCk7CiAgICBf" >> main.b64
+          echo "Y29udHJvbGxlciA9IFdlYlZpZXdDb250cm9sbGVyKCkKICAgICAgLi5zZXRKYXZh" >> main.b64
+          echo "U2NyaXB0TW9kZShKYXZhU2NyaXB0TW9kZS51bnJlc3RyaWN0ZWQpCiAgICAgIC4u" >> main.b64
+          echo "c2V0TmF2aWdhdGlvbkRlbGVnYXRlKAogICAgICAgIE5hdmlnYXRpb25EZWxlZ2F0" >> main.b64
+          echo "ZSgKICAgICAgICAgIG9uUGFnZVN0YXJ0ZWQ6IChfKSA9PiBzZXRTdGF0ZSgoKSA9" >> main.b64
+          echo "PiBfaXNMb2FkaW5nID0gdHJ1ZSksCiAgICAgICAgICBvblBhZ2VGaW5pc2hlZDog" >> main.b64
+          echo "KF8pID0+IHNldFN0YXRlKCgpID0+IF9pc0xvYWRpbmcgPSBmYWxzZSksCiAgICAg" >> main.b64
+          echo "ICAgKSwKICAgICAgKQogICAgICAuLmxvYWRSZXF1ZXN0KFVyaS5wYXJzZSgnaHR0" >> main.b64
+          echo "cHM6Ly9rYXJlaW52ZXN0bWVudGdyb3VwLmNvbS8nKSk7CiAgfQoKICBAb3ZlcnJp" >> main.b64
+          echo "ZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIHsKICAgIHJl" >> main.b64
+          echo "dHVybiBQb3BTY29wZSgKICAgICAgY2FuUG9wOiBmYWxzZSwKICAgICAgb25Qb3BJ" >> main.b64
+          echo "bnZva2VkV2l0aFJlc3VsdDogKGRpZFBvcCwgcmVzdWx0KSBhc3luYyB7CiAgICAg" >> main.b64
+          echo "ICAgaWYgKGRpZFBvcCkgcmV0dXJuOwogICAgICAgIGlmIChhd2FpdCBfY29udHJv" >> main.b64
+          echo "bGxlci5jYW5Hb0JhY2soKSkgewogICAgICAgICAgYXdhaXQgX2NvbnRyb2xsZXIu" >> main.b64
+          echo "Z29CYWNrKCk7CiAgICAgICAgfQogICAgICB9LAogICAgICBjaGlsZDogU2NhZmZv" >> main.b64
+          echo "bGQoCiAgICAgICAgYmFja2dyb3VuZENvbG9yOiBDb2xvcnMud2hpdGUsCiAgICAg" >> main.b64
+          echo "ICAgYm9keTogU2FmZUFyZWEoCiAgICAgICAgICBjaGlsZDogU3RhY2soCiAgICAg" >> main.b64
+          echo "ICAgICAgIGNoaWxkcmVuOiBbCiAgICAgICAgICAgICAgV2ViVmlld1dpZGdldChj" >> main.b64
+          echo "b250cm9sbGVyOiBfY29udHJvbGxlciksCiAgICAgICAgICAgICAgaWYgKF9pc0xv" >> main.b64
+          echo "YWRpbmcpCiAgICAgICAgICAgICAgICBjb25zdCBDZW50ZXIoY2hpbGQ6IENpcmN1" >> main.b64
+          echo "bGFyUHJvZ3Jlc3NJbmRpY2F0b3IoKSksCiAgICAgICAgICAgIF0sCiAgICAgICAg" >> main.b64
+          echo "ICApLAogICAgICAgICksCiAgICAgICksCiAgICApOwogIH0KfQo=" >> main.b64
+          base64 -d main.b64 > lib/main.dart
           flutter build apk --release
 
       - name: Upload Ready APK
